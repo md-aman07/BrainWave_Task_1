@@ -1,0 +1,153 @@
+#include <iostream>
+#include <unordered_map>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class ATM {
+private:
+    struct Account {
+        string pin;
+        double balance;
+    };
+
+    unordered_map<int, Account> accounts;
+
+    bool authenticate(int accountNumber, const string& pin) {
+        return accounts.find(accountNumber) != accounts.end() && accounts[accountNumber].pin == pin;
+    }
+
+public:
+    ATM() {
+        // Preloading accounts (Simulating real ATM behavior where accounts are managed by the bank)
+        accounts[1001] = {"1234", 5000.0};
+        accounts[1002] = {"5678", 3000.0};
+        accounts[1003] = {"9876", 7000.0};
+    }
+
+    void deposit(int accountNumber, double amount) {
+        if (accounts.find(accountNumber) == accounts.end()) {
+            cout << "\nInvalid account number!\n";
+            return;
+        }
+        if (amount > 0) {
+            accounts[accountNumber].balance += amount;
+            cout << "\nDeposit successful! New balance: $" << fixed << setprecision(2) << accounts[accountNumber].balance << "\n";
+        } else {
+            cout << "\nInvalid deposit amount!\n";
+        }
+    }
+
+    void withdraw(int accountNumber, const string& pin, double amount) {
+        if (!authenticate(accountNumber, pin)) {
+            cout << "\nAuthentication failed!\n";
+            return;
+        }
+        if (amount > 0 && accounts[accountNumber].balance >= amount) {
+            accounts[accountNumber].balance -= amount;
+            cout << "\nWithdrawal successful! Remaining balance: $" << fixed << setprecision(2) << accounts[accountNumber].balance << "\n";
+        } else {
+            cout << "\nInsufficient funds or invalid amount!\n";
+        }
+    }
+
+    void checkBalance(int accountNumber, const string& pin) {
+        if (!authenticate(accountNumber, pin)) {
+            cout << "\nAuthentication failed!\n";
+            return;
+        }
+        cout << "\nCurrent balance: $" << fixed << setprecision(2) << accounts[accountNumber].balance << "\n";
+    }
+
+    void transfer(int fromAccount, const string& fromPin, int toAccount, double amount) {
+        if (!authenticate(fromAccount, fromPin)) {
+            cout << "\nAuthentication failed for sender!\n";
+            return;
+        }
+        if (accounts.find(toAccount) == accounts.end()) {
+            cout << "\nRecipient account does not exist!\n";
+            return;
+        }
+        if (amount > 0 && accounts[fromAccount].balance >= amount) {
+            accounts[fromAccount].balance -= amount;
+            accounts[toAccount].balance += amount;
+            cout << "\nTransfer successful! New balance: $" << fixed << setprecision(2) << accounts[fromAccount].balance << "\n";
+        } else {
+            cout << "\nInsufficient balance or invalid transfer amount!\n";
+        }
+    }
+};
+
+int main() {
+    ATM atm;
+    int choice;
+
+    do {
+        cout << "\n----- ATM Interface -----\n";
+        cout << "1. Deposit\n";
+        cout << "2. Withdraw\n";
+        cout << "3. Check Balance\n";
+        cout << "4. Transfer Money\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int accountNumber;
+                double amount;
+                cout << "\nEnter account number: ";
+                cin >> accountNumber;
+                cout << "Enter amount to deposit: ";
+                cin >> amount;
+                atm.deposit(accountNumber, amount);
+                break;
+            }
+            case 2: {
+                int accountNumber;
+                string pin;
+                double amount;
+                cout << "\nEnter account number: ";
+                cin >> accountNumber;
+                cout << "Enter PIN: ";
+                cin >> pin;
+                cout << "Enter amount to withdraw: ";
+                cin >> amount;
+                atm.withdraw(accountNumber, pin, amount);
+                break;
+            }
+            case 3: {
+                int accountNumber;
+                string pin;
+                cout << "\nEnter account number: ";
+                cin >> accountNumber;
+                cout << "Enter PIN: ";
+                cin >> pin;
+                atm.checkBalance(accountNumber, pin);
+                break;
+            }
+            case 4: {
+                int fromAccount, toAccount;
+                string fromPin;
+                double amount;
+                cout << "\nEnter sender account number: ";
+                cin >> fromAccount;
+                cout << "Enter sender PIN: ";
+                cin >> fromPin;
+                cout << "Enter recipient account number: ";
+                cin >> toAccount;
+                cout << "Enter amount to transfer: ";
+                cin >> amount;
+                atm.transfer(fromAccount, fromPin, toAccount, amount);
+                break;
+            }
+            case 5:
+                cout << "\nThank you for using the ATM. Goodbye!\n";
+                break;
+            default:
+                cout << "\nInvalid choice! Please try again.\n";
+        }
+    } while (choice != 5);
+    return 0;
+}
