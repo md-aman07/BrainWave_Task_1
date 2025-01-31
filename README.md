@@ -31,7 +31,7 @@ Installation & Usage
 
 Clone the Repository:
 
-git clone https://github.com/yourusername/ATM-Interface.git
+git clone [https://github.com/yourusername/ATM-Interface.git](https://github.com/md-aman07/BrainWave_Task_1/blob/main/ATM%20interface)
 cd ATM-Interface
 
 Compile the Code:
